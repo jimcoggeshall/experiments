@@ -1,0 +1,21 @@
+#!/usr/bin/env python3
+
+import sys
+import domainext
+
+def main():
+
+    parser = argparse.ArgumentParser(
+        description="Extract second-level domain from URL(s) on STDIN",
+        usage="cat one_url_per_line.txt | %(prog)s > one_sld_per_line.txt"
+    )
+
+    for line in sys.stdin:
+        result = domainext.sld_from_url(line.rstrip("\n")
+        sys.stdout.write("{}\n".format(result))
+
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
