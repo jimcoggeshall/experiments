@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+    testapp:
+        image: testapp:testtag
+        build:
+            context: .
+            dockerfile: Dockerfile
+            shm_size: '2gb'
+        volumes: 
+            - type: bind
+              source: ./output
+              target: /output

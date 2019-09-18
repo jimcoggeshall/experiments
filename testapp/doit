@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -x
+
+url=$1
+
+workdir=/$(uuidgen)
+mkdir -p "$workdir" && chmod 777 "$workdir"
+pushd "$workdir"
+cp /run.js "$workdir"
+mkdir user-data
+mkdir user-home
+
+dbus-uuidgen --ensure
+export $(/usr/bin/dbus-launch)
+/usr/bin/xvfb-run -n 89 --server-args="-screen 0 1920x1200x24 -ac -nolisten tcp -dpi 96 +extension RANDR" /usr/bin/chromium-browser --disable-dev-shm-usage --disable-gpu --no-sandbox --disable-setuid-sandbox --enable-viewport --disable-features=NetworkService --window-size=1200,1200 --window-position=360,0 --bwsi --disable-background-networking --disable-default-apps --disable-component-cloud-policy --disable-component-update --disable-extensions --disable-sync --disable-test-root-certs --no-default-browser-check --no-crash-upload --no-first-run --no-referrers --run-web-tests --save-page-as-mhtml --log-file=$workdir/main.log --log-level=0 --log-net-log=$workdir/net.log --user-data-dir=$workdir/user-data --test-logging-path=$workdir/test.log --homedir=$workdir/user-home --dump-raw-logs --ignore-previews-blacklist --unsafely-treat-insecure-origin-as-secure --ssl-key-log-file=$workdir/ssl_keys.log --remote-debugging-port=9222 &
+/usr/bin/ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1200 -i :89 -c:v libvpx -quality realtime -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -timelimit 100 -an "$workdir/screen.webm" &
+WPID=$!
+sleep 3
+
+NOW=$(date +%Y%m%d%H%M%S)
+tcpdump -KUnnvvv -Z nobody -s0 -i eth0 -w "$workdir/session.pcap" &
+PID=$!
+timeout 60s node run.js $url |& tee "$workdir/console.log"
+sleep 1
+kill -TERM $PID $WPID
+
+outdir=/output/$NOW
+mkdir -p "$outdir"
+chmod -R 777 *
+mv * "$outdir"
+chmod -R 777 "$outdir"
+
+popd
