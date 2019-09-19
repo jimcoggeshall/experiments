@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
 import sys
-import domainext
+import argparse
+from urlutil import domainext
 
 def main():
 
@@ -10,8 +11,10 @@ def main():
         usage="cat one_url_per_line.txt | %(prog)s > one_sld_per_line.txt"
     )
 
+    args = parser.parse_args()
+
     for line in sys.stdin:
-        result = domainext.sld_from_url(line.rstrip("\n")
+        result = domainext.sld_from_url(line.rstrip("\n"))
         sys.stdout.write("{}\n".format(result))
 
     return 0
