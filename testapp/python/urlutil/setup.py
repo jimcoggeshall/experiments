@@ -4,7 +4,10 @@ setup(
     version="1.0",
     packages=find_packages(),
     test_suite="tests",
-    scripts=["scripts/url2sld"],
+    scripts=[
+        "scripts/url2sld",
+        "scripts/url2fqdn"
+    ],
     python_requires=">=3.6",
     install_requires=["tldextract>=2.2.1"],
     author="Jim Coggeshall",

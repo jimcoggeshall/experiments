@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get -y install xvfb dbus dbus-x11 ffmpeg tcpdump uuid-runtime wget gtk2-engines-pixbuf xfonts-cyrillic xfonts-100dpi xfonts-75dpi xfonts-base xfonts-scalable imagemagick x11-apps python3 python3-pip python3-setuptools
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive && apt-get -y install xvfb dbus dbus-x11 ffmpeg tcpdump uuid-runtime wget gtk2-engines-pixbuf xfonts-cyrillic xfonts-100dpi xfonts-75dpi xfonts-base xfonts-scalable imagemagick x11-apps python3 python3-pip python3-setuptools jq
 RUN dbus-uuidgen --ensure
 RUN apt-get update && apt-get -y install chromium-browser
 RUN mkdir -p /usr/local/nvm
