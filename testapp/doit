@@ -4,6 +4,8 @@ set -x
 
 url=$1
 
+source $NVM_DIR/nvm.sh
+
 workdir=/$(uuidgen)
 mkdir -p "$workdir" && chmod 777 "$workdir"
 pushd "$workdir"
@@ -11,28 +13,113 @@ cp /run.js "$workdir"
 mkdir user-data
 mkdir user-home
 
-dbus-uuidgen --ensure
-export $(/usr/bin/dbus-launch)
-/usr/bin/xvfb-run -n 89 --server-args="-screen 0 1920x1200x24 -ac -nolisten tcp -dpi 96 +extension RANDR" /usr/bin/chromium-browser --disable-dev-shm-usage --disable-gpu --no-sandbox --disable-setuid-sandbox --enable-viewport --disable-features=NetworkService --window-size=1200,1200 --window-position=360,0 --bwsi --disable-background-networking --disable-default-apps --disable-component-cloud-policy --disable-component-update --disable-extensions --disable-sync --disable-test-root-certs --no-default-browser-check --no-crash-upload --no-first-run --no-referrers --run-web-tests --save-page-as-mhtml --log-file=$workdir/main.log --log-level=0 --log-net-log=$workdir/net.log --user-data-dir=$workdir/user-data --test-logging-path=$workdir/test.log --homedir=$workdir/user-home --dump-raw-logs --ignore-previews-blacklist --unsafely-treat-insecure-origin-as-secure --ssl-key-log-file=$workdir/ssl_keys.log --remote-debugging-port=9222 &
-/usr/bin/ffmpeg -r 30 -f x11grab -draw_mouse 0 -s 1920x1200 -i :89 -c:v libvpx -quality realtime -cpu-used 0 -b:v 384k -qmin 10 -qmax 42 -maxrate 384k -bufsize 1000k -timelimit 100 -an "$workdir/screen.webm" &
-WPID=$!
-sleep 5
-
-NOW=$(date +%Y%m%d%H%M%S)
-tcpdump -KUnnvvv -Z nobody -s0 -i eth0 -w "$workdir/session.pcap" &
-PID=$!
-timeout 60s node run.js $url |& tee "$workdir/console.log"
-sleep 1
-kill -TERM $PID $WPID
-
-cat "$workdir/extracted.json" | jq ".[]" | jq -rc ".href" > "$workdir/urls.txt"
-cat "$workdir/urls.txt" | url2fqdn > "$workdir/fqdns.txt"
-cat "$workdir/urls.txt" | url2sld > "$workdir/slds.txt"
-
-outdir=/output/$NOW
-mkdir -p "$outdir"
-chmod -R 777 *
-mv * "$outdir"
+outdir=/output
+if [ -d "$outdir" ]; then
+    rm -rf "$outdir"
+fi
+#mkdir -p $outdir/stream
 chmod -R 777 "$outdir"
 
-popd
+function cleanup {
+    kill -TERM $WPID $NPID $XPID
+    chmod -R 777 "$outdir"
+    popd
+}
+trap cleanup HUP INT TERM QUIT ABRT FPE ALRM EXIT
+
+dbus-uuidgen --ensure
+export $(/usr/bin/dbus-launch)
+/usr/bin/xvfb-run -n 89 \
+    --server-args="-screen 0 2304x1440x24 -ac -nolisten tcp -dpi 96 +extension RANDR" \
+    /usr/bin/chromium \
+    --disable-backing-store-limit \
+    --start-fullscreen \
+    --disable-dev-shm-usage \
+    --disable-gpu \
+    --no-sandbox \
+    --disable-setuid-sandbox \
+    --enable-viewport \
+    --disable-features=NetworkService \
+    --disable-background-networking \
+    --disable-default-apps \
+    --disable-component-cloud-policy \
+    --disable-component-update \
+    --disable-extensions \
+    --disable-sync \
+    --disable-test-root-certs \
+    --no-default-browser-check \
+    --no-crash-upload \
+    --no-first-run \
+    --no-referrers \
+    --log-file=$workdir/main.log \
+    --log-level=0 \
+    --log-net-log=$workdir/net.log \
+    --user-data-dir=$workdir/user-data \
+    --test-logging-path=$workdir/test.log \
+    --homedir=$workdir/user-home \
+    --dump-raw-logs \
+    --ignore-previews-blacklist \
+    --unsafely-allow-protected-media-identifier-for-domain \
+    --unsafely-treat-insecure-origin-as-secure \
+    --ssl-key-log-file=$workdir/ssl_keys.log \
+    --remote-debugging-port=9222 \
+    --window-position="0,0" \
+    --window-size="2304,1440" &
+XPID=$!
+/usr/bin/ffmpeg -r 30 \
+    -f x11grab \
+    -draw_mouse 0 \
+    -s 2304x1440 \
+    -i :89 \
+    -c:v libvpx \
+    -quality realtime \
+    -cpu-used 0 \
+    -b:v 384k \
+    -qmin 10 \
+    -qmax 42 \
+    -maxrate 384k \
+    -bufsize 1000k \
+    -an "$outdir/screen.webm" &
+#/usr/bin/ffmpeg -r 30 \
+#    -f x11grab \
+#    -draw_mouse 0 \
+#    -i :89 \
+#    -pix_fmt yuv420p \
+#    -vf "scale=w=2304:h=1440:force_original_aspect_ratio=decrease" \
+#    -c:a aac -ar 48000 -b:a 192k \
+#    -c:v h264 \
+#    -profile:v main \
+#    -crf 20 \
+#    -g 48 -keyint_min 48 \
+#    -sc_threshold 0 \
+#    -b:v 5000k -maxrate 5000k -bufsize 7500k \
+#    -hls_time 4 \
+#    -hls_playlist_type vod \
+#    -hls_segment_filename $outdir/stream_%03d.ts \
+#    $output/stream.m3u8 &
+#/usr/bin/ffmpeg -fflags nobuffer \
+#    -r 30 \
+#    -f x11grab \
+#    -draw_mouse 0 \
+#    -i :89 \
+#    -vsync 0 \
+#    -copyts \
+#    -vcodec copy \
+#    -movflags frag_keyframe+empty_moov \
+#    -an \
+#    -hls_flags delete_segments+append_list \
+#    -f segment \
+#    -segment_list_flags live \
+#    -segment_time 1 \
+#    -segment_list_size 3 \
+#    -segment_format mpegts \
+#    -segment_list $outdir/index.m3u8 \
+#    -segment_list_type m3u8 \
+#    -segment_list_entry_prefix /display/output/stream/ \
+#    $outdir/stream/%d.ts
+WPID=$!
+sleep 1
+
+timeout 60s node run.js https://display.jimcoggeshall.com/ |& tee "$workdir/console.log"
+
+kill -TERM $WPID $XPID
