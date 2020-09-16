@@ -118,8 +118,9 @@ XPID=$!
 #    -segment_list_entry_prefix /display/output/stream/ \
 #    $outdir/stream/%d.ts
 WPID=$!
-sleep 1
+sleep 30
 
-timeout 60s node run.js https://display.jimcoggeshall.com/ |& tee "$workdir/console.log"
+node run.js &
+NPID=$!
 
-kill -TERM $WPID $XPID
+wait $WPID $XPID $NPID

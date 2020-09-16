@@ -1,7 +1,7 @@
 version: "3.4"
 services:
     testapp:
-        restart: 'always'
+        restart: 'never'
         image: testapp:testtag
         build:
             context: .
@@ -10,3 +10,4 @@ services:
             - type: bind
               source: ./output
               target: /output
+        network_mode: host
