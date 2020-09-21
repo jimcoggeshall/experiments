@@ -17,14 +17,11 @@ outdir=/output
 if [ -d "$outdir" ]; then
     rm -rf "$outdir"
 fi
-#mkdir -p $outdir/stream
 chmod -R 777 "$outdir"
 
 function cleanup {
     kill -TERM $WPID $NPID $XPID
-    find "$workdir" | while read f; do
-        mv "$f" "$outdir"
-    done
+    mv "$workdir" "$outdir"
     chmod -R 777 "$outdir"
     popd
 }
@@ -126,4 +123,5 @@ sleep 30
 node run.js &
 NPID=$!
 
-wait $WPID $XPID $NPID
+sleep 300
+kill -TERM $WPID $XPID $NPID

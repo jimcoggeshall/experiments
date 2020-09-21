@@ -20,32 +20,45 @@ const fs = require('fs');
       height: 729,
       isLandscape: true
     });
-    await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2', timeout: 0});
+    await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2', timeout: 60000});
 
     await page.evaluate(() => {
-      let button = Array.from(document.querySelectorAll('p'))
-        .find(e => e.textContent === 'Continue');
-      let id = 'randomidhopefullyuniqueone';
-      button.setAttribute('id', id);
+      while (true) {
+        try {
+          let button = Array.from(document.querySelectorAll('p'))
+            .find(e => e.textContent === 'Continue');
+          let id = 'randomidhopefullyuniqueone';
+          button.setAttribute('id', id);
+          break;
+        } catch (e) {
+          continue;
+        }
+      }
     });
     await page.click('#randomidhopefullyuniqueone');
     
-    await page.waitForSelector('#ext-element-993', {timeout: 0});
+    await page.waitForSelector('#ext-element-993', {timeout: 60000});
     await page.click('#ext-element-993');
-    await page.waitForSelector('#ext-element-1137', {timeout: 0});
+    await page.waitForSelector('#ext-element-1137', {timeout: 60000});
     await page.click('#ext-element-1137');
-    await page.waitForSelector('#ext-element-1143', {timeout: 0});
+    await page.waitForSelector('#ext-element-1143', {timeout: 60000});
     await page.click('#ext-element-1143');
 
-    await page.waitForTimeout(30000);
-
-    const contents = await page.content();
-    console.log(contents);
-
-    const session = await page.target().createCDPSession();
-    await session.send('Page.enable');
-    const {data} = await session.send('Page.captureSnapshot');
-    fs.writeFile('page.mhtml', data, 'utf8', () => {});
+    const theLink = await page.evaluate(() => {
+      while (true) {
+        try {
+          let button = Array.from(document.querySelectorAll('a'))
+            .find(e => e.href.split('.').pop() === 'pdf');
+          let id = 'randomidhopefullyuniquetwo';
+          button.setAttribute('id', id);
+          return button.href;
+        } catch (e) {
+          continue;
+        }
+      }
+    });
+    console.log(theLink);
+    await page.click('#randomidhopefullyuniquetwo');
 
     await browser.close();
 
