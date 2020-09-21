@@ -20,7 +20,7 @@ const fs = require('fs');
       height: 729,
       isLandscape: true
     });
-    await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2'});
+    await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2', timeout: 0});
 
     await page.evaluate(() => {
       let button = Array.from(document.querySelectorAll('p'))
@@ -30,37 +30,17 @@ const fs = require('fs');
     });
     await page.click('#randomidhopefullyuniqueone');
     
-    await page.evaluate(() => {
-      let button = Array.from(document.querySelectorAll('.toolbar'))
-        .find(e => e.getAttribute('style').includes('menu-transparent'));
-      let id = 'randomidhopefullyuniquetwo';
-      button.setAttribute('id', id);
-    });
-    await page.click('#randomidhopefullyuniquetwo');
+    await page.waitForSelector('#ext-element-993', {timeout: 0});
+    await page.click('#ext-element-993');
+    await page.waitForSelector('#ext-element-1137', {timeout: 0});
+    await page.click('#ext-element-1137');
+    await page.waitForSelector('#ext-element-1143', {timeout: 0});
+    await page.click('#ext-element-1143');
 
-    await page.evaluate(() => {
-      let button = Array.from(document.querySelectorAll('.x-innerhtml'))
-        .find(e => e.textContent === 'Download');
-      let id = 'randomidhopefullyuniquethree';
-      button.setAttribute('id', id);
-    });
-    await page.click('#randomidhopefullyuniquethree');
-    
-    await page.evaluate(() => {
-      let button = Array.from(document.querySelectorAll('.x-innerhtml'))
-        .find(e => e.textContent === 'Select All');
-      let id = 'randomidhopefullyuniquefour'
-      button.setAttribute('id', id);
-    });
-    await page.click('#randomidhopefullyuniquefour');
+    await page.waitForNavigation({waitUntil: 'networkidle2', timeout: 0});
 
-    await page.evaluate(() => {
-      let button = Array.from(document.querySelectorAll('.x-innerhtml'))
-        .find(e => e.textContent === 'Download');
-      let id = 'randomidhopefullyuniquefive';
-      button.setAttribute('id', id);
-    });
-    await page.click('#randomidhopefullyuniquefive');
+    const contents = await page.content();
+    console.log(contents);
 
     const session = await page.target().createCDPSession();
     await session.send('Page.enable');
