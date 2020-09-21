@@ -2,7 +2,7 @@
 
 set -x
 
-url=$1
+NOW=$(date +%Y%m%d%H%M%S)
 
 source $NVM_DIR/nvm.sh
 
@@ -13,17 +13,19 @@ cp /run.js "$workdir"
 mkdir user-data
 mkdir user-home
 
-outdir=/output
+outdir=/output/$NOW
 if [ -d "$outdir" ]; then
     rm -rf "$outdir"
 fi
+mkdir -p "$outdir"
 chmod -R 777 "$outdir"
 
 function cleanup {
     kill -TERM $WPID $NPID $XPID
-    mv "$workdir" "$outdir"
+    if [ -d "workdir" ]; then
+        mv "$workdir" "$outdir"
+    fi
     chmod -R 777 "$outdir"
-    popd
 }
 trap cleanup HUP INT TERM QUIT ABRT FPE ALRM EXIT
 
@@ -118,10 +120,22 @@ XPID=$!
 #    -segment_list_entry_prefix /display/output/stream/ \
 #    $outdir/stream/%d.ts
 WPID=$!
+sleep 5
+tcpdump -KUnnvvv -Z nobody -s0 -i eth0 -w "$workdir/session.pcap" &
+TPID=$!
+
 sleep 30
 
-node run.js &
-NPID=$!
+timeout 300s node run.js |& tee "$workdir/console.log"
 
-sleep 300
-kill -TERM $WPID $XPID $NPID
+sleep 5
+
+kill -TERM $TPID $WPID $XPID $NPID
+
+cat "$workdir/extracted.json" | jq ".[]" | jq -rc ".href" > "$workdir/urls.txt"
+cat "$workdir/urls.txt" | url2fqdn > "$workdir/fqdns.txt"
+cat "$workdir/urls.txt" | url2sld > "$workdir/slds.txt"
+
+chmod -R 777 "$workdir"
+mv "$workdir" "$outdir"
+chmod -R 777 "$outdir"
