@@ -22,6 +22,9 @@ chmod -R 777 "$outdir"
 
 function cleanup {
     kill -TERM $WPID $NPID $XPID
+    find "$workdir" | while read f; do
+        mv "$f" "$outdir"
+    done
     chmod -R 777 "$outdir"
     popd
 }

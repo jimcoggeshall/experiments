@@ -37,7 +37,7 @@ const fs = require('fs');
     await page.waitForSelector('#ext-element-1143', {timeout: 0});
     await page.click('#ext-element-1143');
 
-    await page.waitForNavigation({waitUntil: 'networkidle2', timeout: 0});
+    await page.waitForTimeout(30000);
 
     const contents = await page.content();
     console.log(contents);
