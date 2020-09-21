@@ -1,4 +1,4 @@
-version: "3.4"
+version: "3.7"
 services:
     testapp:
         restart: 'never'
@@ -6,6 +6,7 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
+            shm_size: '2gb'
         volumes: 
             - type: bind
               source: ./output

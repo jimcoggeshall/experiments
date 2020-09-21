@@ -121,7 +121,7 @@ XPID=$!
 #    $outdir/stream/%d.ts
 WPID=$!
 sleep 5
-tcpdump -KUnnvvv -Z nobody -s0 -i eth0 -w "$workdir/session.pcap" &
+tcpdump -KUnnvvv -Z nobody -s0 -i any -w "$workdir/session.pcap" &
 TPID=$!
 
 sleep 30
