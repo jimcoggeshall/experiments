@@ -15,13 +15,13 @@ const fs = require('fs');
       }
     });
     const page = await browser.newPage();
-    await page.setDefaultTimeout(0);
+    await page.setDefaultTimeout(300000);
     page.setViewport({
       width: 2304,
       height: 1440,
       isLandscape: true
     });
-    await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2', timeout: 0});
+    await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2'});
 
     await page.evaluate(() => {
       var waitInterval = setInterval(() => {
