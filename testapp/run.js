@@ -25,6 +25,7 @@ const fs = require('fs');
 
 
     await page.waitForSelector('.btn');
+    await page.waitForTimeout(3000);
 
     const continueButton = await page.$('#ext-viewport > .x-body > .btn');
     await continueButton.click();
@@ -32,19 +33,21 @@ const fs = require('fs');
 
 
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
+    await page.waitForTimeout(3000);
     const toolbarButtons = await page.$$('.toolbarRightContainer > .x-inner > .toolbarIconRight');
     const downloadButton = toolbarButtons.find(async button => {
-      await button.evaluate(e => {
-        window.getComputedStyle(e)
+      await page.evaluate(b => {
+        window.getComputedStyle(b)
           .getPropertyValue('background-image')
           .includes('downloads-transparent');
-      });
+      }, button);
     });
     await downloadButton.click();
 
 
 
     await page.waitForSelector('.x-innerhtml');
+    await page.waitForTimeout(3000);
     const selectAllButtons = await page.$$('.x-innerhtml');
     const selectAllButton = selectAllButtons.find(async button => {
       let innerText = await button.evaluate(e => e.innerText);
@@ -54,6 +57,7 @@ const fs = require('fs');
 
 
     await page.waitForSelector('.x-innerhtml');
+    await page.waitForTimeout(3000);
     const reallyDownloadButtons = await page.$$('.x-innerhtml');
     const reallyDownloadButton = reallyDownloadButtons.find(async button => {
       let innerText = await button.evaluate(e => e.innerText);
@@ -61,7 +65,7 @@ const fs = require('fs');
     });
    await reallyDownloadButton.click();
 
-   await page.waitForTimeout(30000);
+   await page.waitForTimeout(60000);
 
     const extracted = await page.evaluate(() => {
       const actualUrl = document.URL;
