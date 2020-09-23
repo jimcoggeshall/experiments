@@ -49,12 +49,11 @@ const fs = require('fs');
     const downloadButtonId = toolbarButton.map(b => JSON.parse(b))
       .find(b => b.backgroundImage.includes('downloads-transparent')).id;
     const downloadButtonIdSelector = '#' + downloadButtonId;
-    await page.waitForSelector(downloadButtonId);
-    const downloadButton = await page.$(downloadButtonId);
-    await page.hover(downloadButtonId);
+    await page.waitForSelector(downloadButtonIdSelector);
+    await page.hover(downloadButtonIdSelector);
     await page.waitForTimeout(1000);
+    const downloadButton = page.$(downloadButtonIdSelector);
     await downloadButton.click();
-
 
 
     await page.waitForSelector('.x-innerhtml');
