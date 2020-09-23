@@ -34,8 +34,8 @@ const fs = require('fs');
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
     const toolbarButtons = await page.$$( '.toolbarRightContainer > .x-inner > .toolbarIconRight');
     const downloadButton = toolbarButtons.find(async button => {
-      let buttonStyle = await button.getProperty('style');
-      return await buttonStyle.includes('downloads-transparent');
+      let buttonStyle = await button.evaluate(e => e.getAttribute('style'));
+      return buttonStyle.includes('downloads-transparent');
     });
     await downloadButton.click();
 
@@ -44,8 +44,8 @@ const fs = require('fs');
     await page.waitForSelector('.x-innerhtml');
     const selectAllButtons = await page.$$('.x-innerhtml');
     const selectAllButton = selectAllButtons.find(async button => {
-      let innerText = await button.getProperty("innerText");
-      return await innerText === 'Select All';
+      let innerText = await button.evaluate(e => e.innerText);
+      return innerText === 'Select All';
     });
    await selectAllButton.click();
 
@@ -53,8 +53,8 @@ const fs = require('fs');
     await page.waitForSelector('.x-innerhtml');
     const reallyDownloadButtons = await page.$$('.x-innerhtml');
     const reallyDownloadButton = reallyDownloadButtons.find(async button => {
-      let innerText = await button.getProperty("innerText");
-      return await innerText === 'Download';
+      let innerText = await button.evaluate(e => e.innerText);
+      return innerText === 'Download';
     });
    await reallyDownloadButton.click();
 
@@ -62,7 +62,7 @@ const fs = require('fs');
 
     const extracted = await page.evaluate(() => {
       const actualUrl = document.URL;
-      const links = Array.from(document.getElementsByTagName("a"));
+      const links = Array.from(document.getElementsByTagName('a'));
       return JSON.stringify(links.map((n) => {
         return {
           "actualUrl": actualUrl,
