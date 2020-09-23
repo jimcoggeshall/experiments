@@ -23,98 +23,43 @@ const fs = require('fs');
     });
     await page.goto('https://enewspaper.sandiegouniontribune.com/desktop/sdut/default.aspx?pubid=ee84df93-f3c1-463c-a82f-1ab095a198ca', {waitUntil: 'networkidle2'});
 
-    await page.evaluate(() => {
-      var waitInterval = setInterval(() => {
-        try {
-          let button = Array.from(document.querySelectorAll('p'))
-            .find(e => e.textContent === 'Continue');
-          let id = 'randomidhopefullyuniquezero';
-          button.setAttribute('id', id);
-          clearInterval(waitInterval);
-        } catch (e) {
-          () => {};
-        }
-      }, 1000);
+
+    await page.waitForSelector('.btn');
+
+    const continueButton = await page.$('#ext-viewport > .x-body > .btn');
+    await continueButton.click();
+
+
+
+    await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
+    const toolbarButtons = await page.$$( '.toolbarRightContainer > .x-inner > .toolbarIconRight');
+    const downloadButton = toolbarButtons.find(async button => {
+      let buttonStyle = await button.getProperty('style');
+      return await buttonStyle.includes('downloads-transparent');
     });
-    await page.waitForSelector('#randomidhopefullyuniquezero');
-    await page.click('#randomidhopefullyuniquezero');
+    await downloadButton.click();
 
-    await page.evaluate(() => {
-      var waitInterval = setInterval(() => {
-        try {
-          let button = Array.from(document.querySelectorAll('x-inner'))
-            .find(e => {
-              e.parentNode.getAttribute('style').includes('downloads-transparent')
-            });
-          let id = 'randomidhopefullyuniqueone';
-          button.setAttribute('id', id);
-          clearInterval(waitInterval);
-        } catch (e) {
-          () => {};
-        }
-      }, 1000);
+
+
+    await page.waitForSelector('.x-innerhtml');
+    const selectAllButtons = await page.$$('.x-innerhtml');
+    const selectAllButton = selectAllButtons.find(async button => {
+      let innerText = await button.getProperty("innerText");
+      return await innerText === 'Select All';
     });
-    await page.waitForSelector('#randomidhopefullyuniqueone');
-    await page.click('#randomidhopefullyuniqueone');
-    
-    await page.evaluate(() => {
-      var waitInterval = setInterval(() => {
-        try {
-          let button = Array.from(document.querySelectorAll('x-innerhtml'))
-            .find(e => e.innerText === 'Select All');
-          let id = 'randomidhopefullyuniquetwo';
-          button.setAttribute('id', id);
-          clearInterval(waitInterval);
-        } catch (e) {
-          () => {};
-        }
-      }, 1000);
+   await selectAllButton.click();
+
+
+    await page.waitForSelector('.x-innerhtml');
+    const reallyDownloadButtons = await page.$$('.x-innerhtml');
+    const reallyDownloadButton = reallyDownloadButtons.find(async button => {
+      let innerText = await button.getProperty("innerText");
+      return await innerText === 'Download';
     });
-    await page.waitForSelector('#randomidhopefullyuniquetwo');
-    await page.click('#randomidhopefullyuniquetwo');
+   await reallyDownloadButton.click();
 
+   await page.waitForTimeout(30000);
 
-    await page.evaluate(() => {
-      var waitInterval = setInterval(() => {
-        try {
-          let button = Array.from(document.querySelectorAll('x-innerhtml'))
-            .find(e => e.innerText === 'Download');
-          let id = 'randomidhopefullyuniquethree';
-          button.setAttribute('id', id);
-          clearInterval(waitInterval);
-        } catch (e) {
-          () => {};
-        }
-      }, 1000);
-    });
-    await page.waitForSelector('#randomidhopefullyuniquethree');
-    await page.click('#randomidhopefullyuniquethree');
-
-
-    const theLink = await page.evaluate(() => {
-      var waitInterval = setInterval(() => {
-        try {
-          let button = Array.from(document.querySelectorAll('a'))
-            .find(e => e.href.split('.').pop() === 'pdf');
-          let id = 'randomidhopefullyuniquefour';
-          button.setAttribute('id', id);
-          clearInterval(waitInterval);
-          return button.href;
-        } catch (e) {
-          () => {};
-        }
-      }, 1000);
-    });
-    console.log(theLink);
-    fs.writeFile('the_link.json', JSON.stringify({'link': theLink}), 'utf8', () => {});
-    await page.waitForSelector('#randomidhopefullyuniquefour');
-    await page.click('#randomidhopefullyuniquefour');
-
-    const session = await page.target().createCDPSession();
-    await session.send('Page.enable');
-    const {data} = await session.send('Page.captureSnapshot');
-    fs.writeFile('page.mhtml', data, 'utf8', () => {});
-    await page.screenshot({path: 'screenshot.png', fullPage: true});
     const extracted = await page.evaluate(() => {
       const actualUrl = document.URL;
       const links = Array.from(document.getElementsByTagName("a"));
