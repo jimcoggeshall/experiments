@@ -15,7 +15,7 @@ const fs = require('fs');
       }
     });
     const page = await browser.newPage();
-    page.on('console', msg => console.log('PAGE LOG:', msg.text());
+    page.on('console', msg => console.log('PAGE LOG:', msg.text()));
     await page.setDefaultTimeout(300000);
     page.setViewport({
       width: 2304,
