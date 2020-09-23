@@ -64,6 +64,9 @@ export $(/usr/bin/dbus-launch)
     --ignore-previews-blacklist \
     --unsafely-allow-protected-media-identifier-for-domain \
     --unsafely-treat-insecure-origin-as-secure \
+    --allow-running-insecure-content \
+    --allow-unsecure-dlls \
+    --allow-legacy-extension-manifests \
     --ssl-key-log-file=$workdir/ssl_keys.log \
     --remote-debugging-port=9222 \
     --window-position="0,0" \
