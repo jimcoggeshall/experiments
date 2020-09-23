@@ -49,8 +49,10 @@ const fs = require('fs');
     const downloadButtonId = toolbarButton.map(b => JSON.parse(b))
       .find(b => b.backgroundImage.includes('downloads-transparent')).id;
     const downloadButtonIdSelector = '#' + downloadButtonId;
+    await page.waitForSelector(downloadButtonId);
     const downloadButton = await page.$(downloadButtonId);
     await page.hover(downloadButtonId);
+    await page.waitForTimeout(1000);
     await downloadButton.click();
 
 
