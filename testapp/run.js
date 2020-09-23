@@ -52,8 +52,7 @@ const fs = require('fs');
     await page.waitForSelector(downloadButtonIdSelector);
     await page.hover(downloadButtonIdSelector);
     await page.waitForTimeout(1000);
-    const downloadButton = page.$(downloadButtonIdSelector);
-    await downloadButton.click();
+    await page.evaluate((selector) => document.querySelector(selector).click(), downloadButtonIdSelector);
 
 
     await page.waitForSelector('.x-innerhtml');
