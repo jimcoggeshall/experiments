@@ -35,14 +35,17 @@ const fs = require('fs');
 
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
     await page.waitForTimeout(3000);
-    const toolbarButtons = await page.$$('.toolbarRightContainer > .x-inner > .toolbarIconRight');
-    const downloadButton = toolbarButtons.find(async button => {
-      await page.evaluate(b => {
-        window.getComputedStyle(b)
-          .getPropertyValue('background-image')
-          .includes('downloads-transparent');
-      }, button);
-    });
+    const toolbarButton = await page.$$eval(
+      '.toolbarRightContainer > .x-inner > .toolbarIconRight',
+      arr => arr.map(e => JSON.stringify({
+        'id': e.getAttribute('id'),
+        'backgroundImage': window.getComputedStyle(e).getPropertyValue('background-image')
+      }))
+    );
+    const downloadButtonId = toolbarButton.map(b => JSON.parse(b))
+      .find(b => b.backgroundImage.includes('downloads-transparent')).id;
+    const downloadButtonIdSelector = '#' + downloadButtonId;
+    const downloadButton = await page.$(downloadButtonId);
     await downloadButton.click();
 
 
