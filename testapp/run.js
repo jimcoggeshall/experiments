@@ -34,10 +34,11 @@ const fs = require('fs');
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
     const toolbarButtons = await page.$$('.toolbarRightContainer > .x-inner > .toolbarIconRight');
     const downloadButton = toolbarButtons.find(async button => {
-      let buttonStyle = await button.evaluate(e => {
-        window.getComputedStyle(e).getPropertyValue('background-image')
+      await button.evaluate(e => {
+        window.getComputedStyle(e)
+          .getPropertyValue('background-image')
+          .includes('downloads-transparent');
       });
-      return buttonStyle.includes('downloads-transparent');
     });
     await downloadButton.click();
 
