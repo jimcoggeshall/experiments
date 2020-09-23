@@ -56,10 +56,11 @@ export $(/usr/bin/dbus-launch)
     --log-file=$workdir/main.log \
     --log-level=0 \
     --log-net-log=$workdir/net.log \
+    --enable-logging --v=1 \
+    --net-log-capture-mode="Everything" \
     --user-data-dir=$workdir/user-data \
     --test-logging-path=$workdir/test.log \
     --homedir=$workdir/user-home \
-    --dump-raw-logs \
     --ignore-previews-blacklist \
     --unsafely-allow-protected-media-identifier-for-domain \
     --unsafely-treat-insecure-origin-as-secure \
@@ -124,7 +125,7 @@ sleep 5
 tcpdump -KUnnvvv -Z nobody -s0 -i any -w "$workdir/session.pcap" &
 TPID=$!
 
-sleep 30
+sleep 5
 
 timeout 300s node run.js |& tee "$workdir/console.log"
 
