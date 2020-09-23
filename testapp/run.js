@@ -31,9 +31,13 @@ const fs = require('fs');
     const continueButton = await page.$('#ext-viewport > .x-body > .btn');
     await continueButton.click();
 
-
+    await page.waitForTimeout(3000);
+    await page.mouse.wheel({deltaY: -121});
+    await page.waitForTimeout(1000);
+    await page.mouse.wheel({deltaY: 121});
 
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
+    await page.hover('.toolbarRightContainer > .x-inner > .toolbarIconRight');
     await page.waitForTimeout(3000);
     const toolbarButton = await page.$$eval(
       '.toolbarRightContainer > .x-inner > .toolbarIconRight',
@@ -46,6 +50,7 @@ const fs = require('fs');
       .find(b => b.backgroundImage.includes('downloads-transparent')).id;
     const downloadButtonIdSelector = '#' + downloadButtonId;
     const downloadButton = await page.$(downloadButtonId);
+    await page.hover(downloadButtonId);
     await downloadButton.click();
 
 
