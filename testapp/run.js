@@ -96,16 +96,20 @@ const fs = require('fs');
       const actualUrl = document.URL;
       const links = Array.from(document.getElementsByTagName('a'));
       return JSON.stringify(links.map((n) => {
-        return {
-          "actualUrl": actualUrl,
-          "href": n.getAttribute("href"),
-          "innerHTML": n.innerHTML,
-          "hreflang": n.getAttribute("hreflang"),
-          "ping": n.getAttribute("ping"),
-          "referrerpolicy": n.getAttribute("referrerpolicy"),
-          "rel": n.getAttribute("rel"),
-          "target": n.getAttribute("target")
-        };
+        try {
+          return {
+            "actualUrl": actualUrl,
+            "href": n.getAttribute("href"),
+            "innerHTML": n.innerHTML,
+            "hreflang": n.getAttribute("hreflang"),
+            "ping": n.getAttribute("ping"),
+            "referrerpolicy": n.getAttribute("referrerpolicy"),
+            "rel": n.getAttribute("rel"),
+            "target": n.getAttribute("target")
+          };
+        } catch (e) {
+          return {"error": e.toString()};
+        }
       }));
     });
     fs.writeFile('extracted.json', extracted,'utf8', () => {});
