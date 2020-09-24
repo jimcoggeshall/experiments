@@ -62,16 +62,12 @@ const fs = require('fs');
     await page.click(selectAllButtonIdSelector);
 
 
-    await page.waitForSelector('.x-innerhtml');
     await page.waitForTimeout(3000);
-    const reallyDownloadButtons = await page.$$eval('.x-innerhtml',
-      arr => arr.map(e => JSON.stringify({
-        'id': e.getAttribute('id'),
-        'innerText': e.innerText
-      }))
-    );
-    const reallyDownloadButtonId = reallyDownloadButtons.map(b => JSON.parse(b))
-      .find(b => b.innerText === 'Download').id;
+
+    var selectAllButtonIdArr = selectAllButtonId.split('-');
+    var selectAllButtonIdIndex = parseInt(selectAllButtonIdArr.pop());
+    selectAllButtonIdArr.push(selectAllButtonIdIndex + 2);
+    const reallyDownloadButtonId = selectAllButtonIdArr.join('-');
     const reallyDownloadButtonIdSelector = '#' + reallyDownloadButtonId;
     await page.click(reallyDownloadButtonIdSelector);
 
