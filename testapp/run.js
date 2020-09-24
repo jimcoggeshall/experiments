@@ -74,6 +74,9 @@ const fs = require('fs');
    await reallyDownloadButton.click();
 
    await page.waitForTimeout(60000);
+   
+   const contents = await page.content();
+   fs.writeFile('contents.json', contents,'utf8', () => {});
 
     const extracted = await page.evaluate(() => {
       const actualUrl = document.URL;
