@@ -147,6 +147,12 @@ tshark -2 -V \
     -o ssl.desegment_ssl_application_data:TRUE \
     -T ek > "$workdir/ts.jsonl"
 
+cat "$workdir/ts.jsonl" | jq '.layers.http.http_http_file_data ' | awk '/Your PDF is ready/ {print}' > "$workdir/http_file_data.txt"
+urlextract "$workdir/http_file_data.txt" | awk '/\.pdf$/' > "$workdir/pdf_url.txt"
+mkdir -p "$workdir/pdf_output" && pushd "$workdir/pdf_output"
+wget $(cat "$workdir/pdf_url.txt")
+popd
+
 chmod -R 777 "$workdir"
 mv "$workdir" "$outdir"
 chmod -R 777 "$outdir"

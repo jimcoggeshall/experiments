@@ -10,6 +10,7 @@ RUN /bin/bash -c "source $NVM_DIR/nvm.sh && nvm install node && nvm use --delete
 RUN /bin/bash -c "source $NVM_DIR/nvm.sh && npm install puppeteer-core axios"
 COPY python /usr/local/python
 RUN cd /usr/local/python/urlutil && python3 setup.py test && python3 setup.py install
+RUN pip3 install urlextract
 COPY doit /
 COPY run.js /
 ENTRYPOINT ["/doit"]

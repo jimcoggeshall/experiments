@@ -74,9 +74,6 @@ const fs = require('fs');
 
    await page.waitForTimeout(60000);
 
-   await page.waitForSelector('#divInfo > div.infoBox > div.loaderBox > p:nth-child(5) > span > a');
-   await page.click('#divInfo > div.infoBox > div.loaderBox > p:nth-child(5) > span > a');
-   
    const contents = await page.content();
    fs.writeFile('contents.json', contents,'utf8', () => {});
 
