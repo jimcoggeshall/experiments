@@ -32,28 +32,11 @@ const fs = require('fs');
     await continueButton.click();
 
     await page.waitForTimeout(3000);
-    await page.mouse.wheel({deltaY: -121});
-    await page.waitForTimeout(1000);
-    await page.mouse.wheel({deltaY: 121});
 
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
-    await page.hover('.toolbarRightContainer > .x-inner > .toolbarIconRight');
 
     await page.waitForTimeout(3000);
 
-    const toolbarButtonFake = await page.$$eval(
-      '.toolbarRightContainer > .x-inner > .toolbarIconRight',
-      arr => arr.map(e => JSON.stringify({
-        'id': e.getAttribute('id'),
-        'backgroundImage': window.getComputedStyle(e).getPropertyValue('background-image')
-      }))
-    );
-    const downloadButtonIdFake = toolbarButtonFake.map(b => JSON.parse(b))
-      .find(b => b.backgroundImage.includes('downloads-transparent')).id;
-    const downloadButtonIdSelectorFake = '#' + downloadButtonIdFake;
-    await page.waitForSelector(downloadButtonIdSelectorFake);
-    await page.hover(downloadButtonIdSelectorFake);
-    await page.waitForTimeout(1000);
 
     const toolbarButton = await page.$$eval(
       '.toolbarRightContainer > .x-inner > .toolbarIconRight',
