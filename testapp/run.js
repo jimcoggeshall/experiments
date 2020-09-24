@@ -34,45 +34,47 @@ const fs = require('fs');
     await page.waitForTimeout(3000);
 
     await page.waitForSelector('.toolbarRightContainer > .x-inner > .toolbarIconRight');
-
     await page.waitForTimeout(3000);
-
-
-    const toolbarButton = await page.$$eval(
+    const toolbarButtons = await page.$$eval(
       '.toolbarRightContainer > .x-inner > .toolbarIconRight',
       arr => arr.map(e => JSON.stringify({
         'id': e.getAttribute('id'),
         'backgroundImage': window.getComputedStyle(e).getPropertyValue('background-image')
       }))
     );
-    const downloadButtonId = toolbarButton.map(b => JSON.parse(b))
+    const downloadButtonId = toolbarButtons.map(b => JSON.parse(b))
       .find(b => b.backgroundImage.includes('downloads-transparent')).id;
     const downloadButtonIdSelector = '#' + downloadButtonId;
-//    await page.waitForSelector(downloadButtonIdSelector);
-//    await page.hover(downloadButtonIdSelector);
-//    await page.waitForTimeout(1000);
-//    await page.evaluate((selector) => document.querySelector(selector).click(), downloadButtonIdSelector);
     await page.click(downloadButtonIdSelector);
 
 
     await page.waitForSelector('.x-innerhtml');
     await page.waitForTimeout(3000);
-    const selectAllButtons = await page.$$('.x-innerhtml');
-    const selectAllButton = selectAllButtons.find(async button => {
-      let innerText = await button.evaluate(e => e.innerText);
-      return innerText === 'Select All';
-    });
-   await selectAllButton.click();
+    const selectAllButtons = await page.$$eval('.x-innerhtml',
+      arr => arr.map(e => JSON.stringify({
+        'id': e.getAttribute('id'),
+        'innerText': e.innerText
+      }))
+    );
+    const selectAllButtonId = selectAllButtons.map(b => JSON.parse(b))
+      .find(b => b.innerText === 'Select All').id;
+    const selectAllButtonIdSelector = '#' + selectAllButtonId;
+    await page.click(selectAllButtonIdSelector);
 
 
     await page.waitForSelector('.x-innerhtml');
     await page.waitForTimeout(3000);
-    const reallyDownloadButtons = await page.$$('.x-innerhtml');
-    const reallyDownloadButton = reallyDownloadButtons.find(async button => {
-      let innerText = await button.evaluate(e => e.innerText);
-      return innerText === 'Download';
-    });
-   await reallyDownloadButton.click();
+    const reallyDownloadButtons = await page.$$eval('.x-innerhtml',
+      arr => arr.map(e => JSON.stringify({
+        'id': e.getAttribute('id'),
+        'innerText': e.innerText
+      }))
+    );
+    const reallyDownloadButtonId = reallyDownloadButtons.map(b => JSON.parse(b))
+      .find(b => b.innerText === 'Download').id;
+    const reallyDownloadButtonIdSelector = '#' + reallyDownloadButtonId;
+    await page.click(reallyDownloadButtonIdSelector);
+
 
    await page.waitForTimeout(60000);
    
